@@ -2,7 +2,7 @@
 
 func! s:RunGuru(mode, format, selected, needs_scope) range abort
   "return with a warning if the binary doesn't exist
-  let bin_path = go#path#CheckBinPath("guru") 
+  let bin_path = go#path#CheckBinPath("guru")
   if empty(bin_path)
     return {'err': "bin path not found"}
   endif
@@ -29,6 +29,11 @@ func! s:RunGuru(mode, format, selected, needs_scope) range abort
 
   " start constructing the 'command' variable
   let command = bin_path
+
+  " enable outputting in json format
+  if exists('g:go_guru_allowerrors')
+    let command .= " -allowerrors"
+  endif
 
   " enable outputting in json format
   if a:format == "json"
@@ -292,7 +297,7 @@ endfunction
 function! go#guru#What(selected)
   " json_encode() and friends are introduced with this patch (7.4.1304)
   " vim: https://groups.google.com/d/msg/vim_dev/vLupTNhQhZ8/cDGIk0JEDgAJ
-  " nvim: https://github.com/neovim/neovim/pull/4131        
+  " nvim: https://github.com/neovim/neovim/pull/4131
   if !exists("*json_decode")
     return {'err': "GoWhat is not supported due old version of Vim/Neovim"}
   endif
@@ -371,7 +376,7 @@ function! go#guru#ClearSameIds()
 endfunction
 
 function! go#guru#ToggleSameIds(selected)
-  if len(getmatches()) != 0 
+  if len(getmatches()) != 0
     call go#guru#ClearSameIds()
   else
     call go#guru#SameIds(a:selected)
